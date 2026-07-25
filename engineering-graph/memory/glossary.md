@@ -34,6 +34,13 @@ Agent'lar ve insanlar aynı dili konuşsun diye. Belirsizlik varsa bu dosya hake
 - **Incremental compilation (artımlı derleme):** Sadece değişen dosyaları derleme optimizasyonu. Başarısız derlemelerden sonra "değişiklik yok" yanılgısına düşüp false green üretebilir (Maven'da yaşandı).
 - **Clean build:** `target/` gibi tüm derleme çıktıları silinip sıfırdan derleme. Yavaştır ama tekrarlanabilir ve dürüsttür; gate'lerde zorunludur.
 
+## Git / izolasyon terimleri
+- **Worktree:** Aynı reponun ikinci bir fiziksel çalışma kopyası; kendi klasörü ve kendi dalı (branch) vardır. Agent izolasyonu için kullanılır — `scripts/worktree-new.sh` açar.
+- **Branch (dal):** Aynı kod tabanında paralel bir zaman çizelgesi. Agent'ın denemeleri kendi dalında yaşar; main ancak merge ile etkilenir.
+- **Merge:** Bir dalın işini başka bir dala (genelde main'e) katma işlemi. Bizde ancak gate'ler yeşil + insan onayı sonrası yapılır.
+- **Fast-forward merge:** Main hiç ilerlemediyse merge'in "ok işaretini ileri alması" — birleştirme commit'i olmadan, temiz tarih.
+- **İzolasyon:** Her işin kendi kum havuzunda (worktree + dal) yapılması; bir agent'ın dağınıklığı başkasını veya main'i kirletmez.
+
 ## Repository memory terimleri
 - **ADR (Architecture Decision Record):** Bir mimari kararın belgesi: bağlam, karar, sonuçlar, alternatifler. Asla silinmez; geçersizse "superseded" olur.
 - **Superseded (geçersiz kılındı):** Bir ADR'nin artık geçerli olmadığını ve yerini hangi yeni ADR'nin aldığını gösteren durum işareti.
