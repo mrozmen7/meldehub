@@ -16,8 +16,15 @@ Agent bir göreve başlamadan ÖNCE bu dosyayı okur.
 - İnsan onayı bile gate'i atlatamaz. Gate kırmızıysa merge yok, istisna yok.
 
 ## 4. Hafıza disiplini (Repository Memory)
-- Agent göreve başlamadan önce `engineering-graph/memory/` altını okur.
-- Mimari karar veren herkes, kararı ADR olarak `memory/decisions/` altına yazar.
+- Agent göreve başlamadan önce sırayla okur:
+  `memory/glossary.md` (ortak dil) → `memory/code-map.md` (harita) →
+  ilgili `memory/decisions/*.md` (geçmiş kararlar).
+- Görev bitince evidence'da "Hafıza etkisi" bölümü zorunludur:
+  - Yeni terim mi doğdu? → `glossary.md`'ye eklenir
+  - Yapı mı değişti (yeni klasör/dosya)? → `code-map.md` güncellenir
+  - Mimari karar mı verildi? → ADR yazılır (`memory/decisions/`)
+- ADR'ler asla silinmez ve üzerine yazılmaz. Geçersiz kılınan karar
+  "Geçersiz kılındı (superseded)" işaretlenir ve yerini gösteren yeni ADR yazılır.
 - ADR olmayan mimari karar "alınmamış" sayılır.
 
 ## 5. Deneme sınırı
