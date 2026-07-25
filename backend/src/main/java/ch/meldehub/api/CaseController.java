@@ -10,4 +10,9 @@ public class CaseController {
     public String ping() {
         return "pong";
     }
+
+    @GetMapping("/api/cases/hello")
+    public String hello() {
+        return "Merhaba from gorev-1";
+    }
 }
