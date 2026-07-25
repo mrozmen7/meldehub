@@ -11,6 +11,7 @@ from typing import TypedDict, Literal
 class GraphState(TypedDict, total=False):
     # --- Girdi ---
     goal: str                      # İnsanın verdiği hedef ("DLQ retry ekle")
+    mode: Literal["sim", "live"]   # sim: simülasyon | live: gerçek delegasyon + gerçek gate'ler
     spec: str                      # Planner'ın ürettiği şartname
 
     # --- Çalışma alanı ---
