@@ -30,6 +30,9 @@ Agent'lar ve insanlar aynı dili konuşsun diye. Belirsizlik varsa bu dosya hake
 - **Evidence (kanıt):** Agent'ın "ne ürettim, nasıl doğruladım, hafızaya etkisi ne, neyi dışarıda bıraktım" raporu. İnsan içindir; sistemin kararı exit code'a dayanır.
 - **Exit code (çıkış kodu):** Bir programın bittiğinde döndürdüğü sayı: 0 = başarı, diğer her şey = hata. Gate'lerin ölçtüğü tek gerçek.
 - **Delegasyon:** Grafiğin kod yazma işini uzman agent'a devretmesi; graf bu sırada donmuş bekler.
+- **False green (yanıltıcı yeşil):** Kod bozukken gate'in YEŞİL dönmesi. En tehlikeli arıza türü: sistem "her şey yolunda" derken yolunda değildir. Faz 5'te yaşandı → ADR-0003.
+- **Incremental compilation (artımlı derleme):** Sadece değişen dosyaları derleme optimizasyonu. Başarısız derlemelerden sonra "değişiklik yok" yanılgısına düşüp false green üretebilir (Maven'da yaşandı).
+- **Clean build:** `target/` gibi tüm derleme çıktıları silinip sıfırdan derleme. Yavaştır ama tekrarlanabilir ve dürüsttür; gate'lerde zorunludur.
 
 ## Repository memory terimleri
 - **ADR (Architecture Decision Record):** Bir mimari kararın belgesi: bağlam, karar, sonuçlar, alternatifler. Asla silinmez; geçersizse "superseded" olur.

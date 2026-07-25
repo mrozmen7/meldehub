@@ -10,8 +10,10 @@ fail=0
 echo "== Quality Gate: kontroller başlıyor =="
 
 if [ -f "$REPO_ROOT/backend/pom.xml" ]; then
-  echo "-- Backend: mvn -q -B test"
-  (cd "$REPO_ROOT/backend" && mvn -q -B test) || fail=1
+  # clean ZORUNLU: incremental build, başarısız derlemelerden sonra
+  # "değişiklik yok" sanıp yeniden derlemeyi atlayabilir → false green (ADR-0003)
+  echo "-- Backend: mvn -q -B clean test"
+  (cd "$REPO_ROOT/backend" && mvn -q -B clean test) || fail=1
 else
   echo "-- Backend: pom.xml yok, atlanıyor"
 fi
