@@ -1,0 +1,83 @@
+<div class="page">
+  <header class="page-header">
+    <h1>İhbar Ver</h1>
+    <p>Belediyeye bir sorun bildirin. Bildiriminiz ilgili birime yönlendirilecektir.</p>
+  </header>
+
+  @if (successCase(); as created) {
+    <div class="alert alert-success" role="status">
+      <strong>İhbarınız başarıyla alındı.</strong>
+      <span>Vaka No: <code>{{ created.id }}</code> — Durum: {{ created.status }}</span>
+    </div>
+  }
+
+  @if (errorMessage(); as msg) {
+    <div class="alert alert-error" role="alert">{{ msg }}</div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="card form">
+    <div class="field">
+      <label for="title">Başlık *</label>
+      <input id="title" type="text" formControlName="title" placeholder="Örn. Kaldırımda çukur" />
+      @if (hasError('title')) {
+        <small class="field-error">{{ errorText('title') }}</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="description">Açıklama *</label>
+      <textarea
+        id="description"
+        formControlName="description"
+        rows="5"
+        placeholder="Sorunu kısaca açıklayınız"
+      ></textarea>
+      @if (hasError('description')) {
+        <small class="field-error">{{ errorText('description') }}</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="category">Kategori *</label>
+      <select id="category" formControlName="category">
+        <option value="" disabled>Kategori seçiniz</option>
+        @for (cat of categories; track cat) {
+          <option [value]="cat">{{ categoryLabels[cat] }}</option>
+        }
+      </select>
+      @if (hasError('category')) {
+        <small class="field-error">{{ errorText('category') }}</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="location">Konum *</label>
+      <input
+        id="location"
+        type="text"
+        formControlName="location"
+        placeholder="Örn. Bahnhofstrasse 12, Zürich"
+      />
+      @if (hasError('location')) {
+        <small class="field-error">{{ errorText('location') }}</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="reporterEmail">E-posta *</label>
+      <input
+        id="reporterEmail"
+        type="email"
+        formControlName="reporterEmail"
+        placeholder="ornek@eposta.ch"
+      />
+      @if (hasError('reporterEmail')) {
+        <small class="field-error">{{ errorText('reporterEmail') }}</small>
+      }
+    </div>
+
+    <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+      {{ submitting() ? 'Gönderiliyor…' : 'İhbarı Gönder' }}
+    </button>
+  </form>
+</div>
