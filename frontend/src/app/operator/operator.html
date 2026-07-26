@@ -1,0 +1,65 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1>Operatör Paneli</h1>
+      <p>Gelen ihbarları sınıflandırın ve durumlarını yönetin.</p>
+    </div>
+    <button class="btn btn-secondary" (click)="reload()" [disabled]="loading()">Yenile</button>
+  </header>
+
+  @if (loadError(); as msg) {
+    <div class="alert alert-error" role="alert">{{ msg }}</div>
+  }
+
+  @if (loading()) {
+    <p class="muted">Yükleniyor…</p>
+  } @else if (cases().length === 0) {
+    <div class="card empty">
+      <p>Henüz ihbar yok.</p>
+      <a routerLink="/report" class="btn btn-primary">İlk İhbarı Ver</a>
+    </div>
+  } @else {
+    <div class="card table-card">
+      <table>
+        <thead>
+          <tr>
+            <th>Başlık</th>
+            <th>Kategori</th>
+            <th>Durum</th>
+            <th>Konum</th>
+            <th>Oluşturulma</th>
+            <th>İşlem</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of cases(); track c.id) {
+            <tr>
+              <td class="title-cell">{{ c.title }}</td>
+              <td>{{ categoryLabels[c.category] }}</td>
+              <td>
+                <span [class]="statusClass(c.status)">{{ statusLabels[c.status] }}</span>
+              </td>
+              <td>{{ c.location }}</td>
+              <td>{{ c.createdAt | date: 'dd.MM.yyyy HH:mm' }}</td>
+              <td class="action-cell">
+                <select
+                  [value]="c.status"
+                  (change)="onStatusChange(c, $event)"
+                  [disabled]="updating()[c.id]"
+                  [attr.aria-label]="'Durum değiştir: ' + c.title"
+                >
+                  @for (s of statuses; track s) {
+                    <option [value]="s">{{ statusLabels[s] }}</option>
+                  }
+                </select>
+                @if (transitionErrors()[c.id]; as err) {
+                  <small class="transition-error" role="alert">{{ err }}</small>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

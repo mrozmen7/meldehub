@@ -20,7 +20,9 @@ else
 fi
 
 if [ -f "$REPO_ROOT/frontend/package.json" ]; then
-  echo "-- Frontend: package.json bulundu (test komutu Faz 10'da bağlanacak)"
+  # npm ci ZORUNLU: package-lock.json'dan birebir kurulum — "bende çalışıyordu"yu önler
+  echo "-- Frontend: npm ci + build + unit testler (Vitest, headless)"
+  (cd "$REPO_ROOT/frontend" && npm ci --no-audit --no-fund && npm run build && npm test -- --watch=false) || fail=1
 else
   echo "-- Frontend: package.json yok, atlanıyor"
 fi

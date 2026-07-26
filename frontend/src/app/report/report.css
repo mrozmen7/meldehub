@@ -1,0 +1,56 @@
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.page-header h1 {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+}
+
+.page-header p {
+  margin: 0 0 20px;
+  color: #5f6b7a;
+}
+
+.form .field {
+  margin-bottom: 16px;
+}
+
+.form label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.form input,
+.form textarea,
+.form select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #c9d1d9;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.form input:focus,
+.form textarea:focus,
+.form select:focus {
+  outline: 2px solid #da291c33;
+  border-color: #da291c;
+}
+
+.field-error {
+  display: block;
+  margin-top: 4px;
+  color: #b00020;
+  font-size: 0.8rem;
+}
+
+button[type='submit'] {
+  width: 100%;
+}

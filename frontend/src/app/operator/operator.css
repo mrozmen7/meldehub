@@ -1,0 +1,124 @@
+.page {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.page-header h1 {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+}
+
+.page-header p {
+  margin: 0;
+  color: #5f6b7a;
+}
+
+.table-card {
+  padding: 0;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  min-width: 760px;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e4e8ec;
+  vertical-align: top;
+}
+
+th {
+  background: #f6f8fa;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #5f6b7a;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+.title-cell {
+  font-weight: 600;
+  max-width: 220px;
+}
+
+.action-cell select {
+  padding: 6px 8px;
+  border: 1px solid #c9d1d9;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  background: #fff;
+}
+
+.transition-error {
+  display: block;
+  margin-top: 6px;
+  color: #b00020;
+  font-size: 0.78rem;
+  max-width: 220px;
+}
+
+/* Durum rozetleri — NEW=gri, TRIAGED=mavi, IN_PROGRESS=turuncu, RESOLVED=yeşil, CLOSED=koyu gri */
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.status-new {
+  background: #e4e8ec;
+  color: #4a5560;
+}
+
+.status-triaged {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.status-in-progress {
+  background: #ffedd5;
+  color: #c2410c;
+}
+
+.status-resolved {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status-closed {
+  background: #374151;
+  color: #f9fafb;
+}
+
+.empty {
+  text-align: center;
+  padding: 48px 24px;
+}
+
+.empty p {
+  margin-top: 0;
+  color: #5f6b7a;
+}
+
+.muted {
+  color: #5f6b7a;
+}
