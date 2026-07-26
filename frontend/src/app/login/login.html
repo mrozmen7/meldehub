@@ -1,0 +1,44 @@
+<div class="page login-page">
+  <header class="page-header">
+    <h1>Giriş Yap</h1>
+    <p>İhbar vermek veya operatör paneline erişmek için giriş yapınız.</p>
+  </header>
+
+  @if (errorMessage(); as msg) {
+    <div class="alert alert-error" role="alert">{{ msg }}</div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" novalidate class="card form login-card">
+    <div class="field">
+      <label for="username">Kullanıcı Adı *</label>
+      <input
+        id="username"
+        type="text"
+        formControlName="username"
+        autocomplete="username"
+        placeholder="Örn. citizen"
+      />
+      @if (form.controls.username.invalid && form.controls.username.touched) {
+        <small class="field-error">Bu alan zorunludur.</small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="password">Şifre *</label>
+      <input
+        id="password"
+        type="password"
+        formControlName="password"
+        autocomplete="current-password"
+        placeholder="••••••••"
+      />
+      @if (form.controls.password.invalid && form.controls.password.touched) {
+        <small class="field-error">Bu alan zorunludur.</small>
+      }
+    </div>
+
+    <button type="submit" class="btn btn-primary" [disabled]="submitting()">
+      {{ submitting() ? 'Giriş yapılıyor…' : 'Giriş Yap' }}
+    </button>
+  </form>
+</div>

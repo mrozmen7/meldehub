@@ -32,3 +32,7 @@ spring:
 app:
   kafka:
     case-created-topic: case-created
+  jwt:
+    # Test secret — main application.yml yerine BU dosya yüklendiği için burada da olmalı
+    secret: meldehub-test-secret-0123456789abcdef0123456789
+    validity-hours: 8

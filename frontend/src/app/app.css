@@ -47,6 +47,52 @@
   color: #b02115;
 }
 
+.user-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-box .username {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #1c2530;
+}
+
+.user-box .role-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #fdecea;
+  color: #b02115;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.user-box .btn-sm {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+
+.user-box .login-link {
+  padding: 8px 14px;
+  border-radius: 6px;
+  color: #4a5560;
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.user-box .login-link:hover {
+  background: #f0f2f5;
+}
+
+.user-box .login-link.active {
+  background: #fdecea;
+  color: #b02115;
+}
+
 .content {
   padding: 28px 24px 48px;
 }

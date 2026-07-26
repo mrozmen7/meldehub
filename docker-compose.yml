@@ -51,6 +51,9 @@ services:
       DB_USER: meldehub
       DB_PASSWORD: meldehub
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      # JWT imzalama anahtarı (CASE-201) — DEMO değeri; production'da
+      # gerçek bir secret ile değiştir (ör. docker secret / vault)
+      JWT_SECRET: meldehub-compose-dev-secret-change-in-production-4b8e1d
     ports:
       - "8080:8080"
     depends_on:

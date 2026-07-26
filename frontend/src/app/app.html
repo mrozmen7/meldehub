@@ -4,8 +4,19 @@
   </a>
   <nav>
     <a routerLink="/report" routerLinkActive="active">İhbar Ver</a>
-    <a routerLink="/operator" routerLinkActive="active">Operatör Paneli</a>
+    @if (auth.hasRole('OPERATOR')) {
+      <a routerLink="/operator" routerLinkActive="active">Operatör Paneli</a>
+    }
   </nav>
+  <div class="user-box">
+    @if (auth.currentUser(); as user) {
+      <span class="username">{{ user.username }}</span>
+      <span class="role-badge">{{ user.role === 'OPERATOR' ? 'Operatör' : 'Vatandaş' }}</span>
+      <button type="button" class="btn btn-secondary btn-sm" (click)="auth.logout()">Çıkış</button>
+    } @else {
+      <a routerLink="/login" routerLinkActive="active" class="login-link">Giriş</a>
+    }
+  </div>
 </header>
 
 <main class="content">
