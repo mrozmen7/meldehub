@@ -7,7 +7,9 @@ spring:
     password: ${DB_PASSWORD:meldehub}
   jpa:
     hibernate:
-      ddl-auto: update   # iskelet aşaması; Flyway migration Faz 11'de (ADR-0005)
+      ddl-auto: validate   # şemayı Flyway kurar (db/migration), Hibernate sadece doğrular (ADR-0005 borcu kapandı)
+  flyway:
+    enabled: true          # V1__init.sql ilk açılışta tabloyu oluşturur
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     producer:

@@ -9,6 +9,12 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+  flyway:
+    # Test stratejisi (b): Flyway testte KAPALI, şema create-drop ile kurulur.
+    # Gerekçe: test ilkesi "dış bağımlılık istemez"; H2'de migration koşturmak
+    # PostgreSQL şemasını doğrulamaz (sahte güven + dialect drift riski).
+    # Migration'ın gerçek doğrulaması docker-compose'taki gerçek PostgreSQL'de yapılır.
+    enabled: false
   kafka:
     # @EmbeddedKafka varsa broker adresini test enjekte eder; yoksa localhost
     bootstrap-servers: ${spring.embedded.kafka.brokers:localhost:9092}
