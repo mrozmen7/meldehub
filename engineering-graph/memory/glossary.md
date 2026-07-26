@@ -53,6 +53,15 @@ Agent'lar ve insanlar aynı dili konuşsun diye. Belirsizlik varsa bu dosya hake
 - **pom.xml:** Maven projesinin kimlik kartı: bağımlılıklar, Java sürümü, build ayarları.
 - **Actuator:** Spring Boot'un üretim izleme eklentisi; `/actuator/health` endpoint'i uygulamanın nabzını dışarı verir (Kubernetes probe'ları buraya bağlanır).
 - **Duman testi (smoke test):** "Uygulama ayağa kalkıyor mu?" sorusunu soran en temel test (Spring'de `contextLoads`). Adı elektronikten gelir: prize tak, duman çıkıyor mu bak.
+- **JPA (Jakarta Persistence):** Java nesnelerini veritabanı tablolarına bağlayan standart; SQL yazmadan kayıt okur/yazarsın.
+- **Entity:** Veritabanı tablosunun Java sınıfı hali (`@Entity`). Bizde: `Case` ↔ `cases` tablosu.
+- **Repository:** Veritabanı kapısı arayüzü; Spring Data JPA implementasyonu çalışma zamanında kendisi üretir.
+- **DTO (Data Transfer Object):** API'nin dış dünyayla konuştuğu veri paketi; entity'yi dışarı açmayız, giriş/çıkış DTO iledir.
+- **@Transactional:** "Ya hep ya hiç" garantisi: metot içindeki tüm veritabanı işlemleri tek pakette başarır veya geri alınır.
+- **Zengin domain modeli (rich domain model):** İş kurallarının servis yerine domain nesnesinin içinde yaşaması (ör. `Case.changeStatus`). Kural atlatılamaz.
+- **Durum makinesi (state machine):** Bir nesnenin hangi durumdan hangi duruma geçebileceğinin kurallı listesi (NEW→TRIAGED→...→CLOSED).
+- **H2:** Bellek içi test veritabanı; testler gerçek PostgreSQL istemeden koşar.
+- **Bean Validation:** `@NotBlank`, `@Email` gibi anotasyonlarla giriş verisi denetimi; controller'da `@Valid` ile devreye girer.
 
 ## Domain terimleri (MeldeHub)
 - **Meldung (ihbar):** Vatandaştan gelen bir bildirim (çukur, arıza, şikâyet).

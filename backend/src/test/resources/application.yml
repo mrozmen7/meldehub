@@ -1,0 +1,9 @@
+# Test profili — GERÇEK PostgreSQL yerine bellek içi H2.
+# İlke: testler dış bağımlılık istemez; CI'da sıfır kurulumla koşar.
+spring:
+  datasource:
+    url: jdbc:h2:mem:meldehub-test
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop

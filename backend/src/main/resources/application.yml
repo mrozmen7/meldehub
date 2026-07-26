@@ -1,6 +1,13 @@
 spring:
   application:
     name: meldehub-backend
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/meldehub}
+    username: ${DB_USER:meldehub}
+    password: ${DB_PASSWORD:meldehub}
+  jpa:
+    hibernate:
+      ddl-auto: update   # iskelet aşaması; Flyway migration Faz 11'de (ADR-0005)
 
 server:
   port: 8080

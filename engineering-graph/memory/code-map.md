@@ -12,7 +12,7 @@ neyin nerede olduğunu öğrenir. Yapı değiştikçe bu dosya GÜNCELLENİR.
 | `engineering-graph/gates/` | Orchestrator | quality + security gate'leri (live modda script çalıştırır) | `scripts/` |
 | `engineering-graph/checkpoints/` | Sistem | graph.db + task-package.json + evidence.md (runtime, gitignore'lu) | — |
 | `engineering-graph/memory/` | Herkes | ADR'ler, code-map, glossary, evidence şablonu | Her agent okur/yazar |
-| `backend/` | spring-architect, kafka-expert | Spring Boot 3.5.3 + Java 21 iskeleti (actuator health ayakta); domain paketleri Faz 8'de, Kafka Faz 9'da | PostgreSQL, Kafka |
+| `backend/` | spring-architect, kafka-expert | Case domain'i ayakta (entity, repository, servis, REST API, yaşam döngüsü); Kafka Faz 9'da | PostgreSQL, Kafka |
 | `frontend/` | angular-expert | Angular panel (Faz 10'da dolacak) | Backend API |
 | `infra/` | İnsan + agent | Docker Compose: Kafka, PostgreSQL, Prometheus | Tüm servisler |
 | `scripts/` | İnsan | run-quality-checks.sh, security-scan.sh, worktree-new.sh | Gate'ler + CI |
