@@ -57,7 +57,7 @@ public class BrokenDemo {
 }
 EOF
 evidence 1
-echo "▶ ADIM 3/7 — Resume: quality gate GERÇEK 'mvn clean test' çalıştırıyor..."
+echo "▶ ADIM 3/7 — Resume: quality gate GERÇEK 'mvn clean verify' çalıştırıyor..."
 resume
 pause
 

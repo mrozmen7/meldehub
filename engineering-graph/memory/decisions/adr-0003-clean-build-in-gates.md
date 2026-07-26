@@ -1,6 +1,8 @@
 # ADR 0003 — Gate'ler neden clean build çalıştırır?
 
-- **Durum (Status):** Kabul edildi
+- **Durum (Status):** Geçersiz kılındı (superseded) → bkz. ADR-0004
+  (`clean test` yerini `clean verify` + coverage eşiğine bıraktı;
+  clean build zorunluluğu aynen geçerli)
 - **Tarih:** 2026-07-25
 
 ## Bağlam (Context)

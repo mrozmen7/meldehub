@@ -1,0 +1,27 @@
+name: quality-gates
+
+# Lokalle birebir AYNI gate'ler: scripts/run-quality-checks.sh + security-scan.sh.
+# İlke (ADR-0004): CI ayrı bir dünya değil, aynı kapıların uzaktan koşmasıdır.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  gates:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Quality gate (test + coverage)
+        run: bash scripts/run-quality-checks.sh
+
+      - name: Security gate (secret taraması)
+        run: bash scripts/security-scan.sh

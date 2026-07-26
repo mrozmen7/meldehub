@@ -12,8 +12,9 @@ echo "== Quality Gate: kontroller başlıyor =="
 if [ -f "$REPO_ROOT/backend/pom.xml" ]; then
   # clean ZORUNLU: incremental build, başarısız derlemelerden sonra
   # "değişiklik yok" sanıp yeniden derlemeyi atlayabilir → false green (ADR-0003)
-  echo "-- Backend: mvn -q -B clean test"
-  (cd "$REPO_ROOT/backend" && mvn -q -B clean test) || fail=1
+  # verify ZORUNLU: test + JaCoCo coverage eşiği birlikte denetlenir (ADR-0004)
+  echo "-- Backend: mvn -q -B clean verify (test + coverage eşiği)"
+  (cd "$REPO_ROOT/backend" && mvn -q -B clean verify) || fail=1
 else
   echo "-- Backend: pom.xml yok, atlanıyor"
 fi
