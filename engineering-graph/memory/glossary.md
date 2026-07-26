@@ -63,6 +63,19 @@ Agent'lar ve insanlar aynı dili konuşsun diye. Belirsizlik varsa bu dosya hake
 - **H2:** Bellek içi test veritabanı; testler gerçek PostgreSQL istemeden koşar.
 - **Bean Validation:** `@NotBlank`, `@Email` gibi anotasyonlarla giriş verisi denetimi; controller'da `@Valid` ile devreye girer.
 
+## Messaging / Kafka terimleri
+- **Topic:** Kafka'da mesajların aktığı adlandırılmış kanal (`case-created`).
+- **Partition:** Topic'in paralel bölümleri; aynı key'li mesajlar aynı partition'a → sıra garantisi.
+- **Producer:** Topic'e mesaj basan taraf (bizde `CaseEventProducer`).
+- **Consumer:** Topic'i okuyan taraf (bizde `RoutingConsumer`).
+- **Consumer group:** Aynı mesajı paylaşarak okuyan consumer ekibi; farklı grup = herkes kendi kopyasını okur.
+- **Offset:** Consumer'ın topic'te "nerede kaldığı"nın imi; yeniden başlatınca oradan devam eder.
+- **DLQ / DLT (Dead Letter Queue/Topic):** Tekrarlanan denemelere rağmen işlenemeyen mesajın taşındığı kuyruk (`case-created.DLT`). Zehirli mesaj ana akışı kilitlemez.
+- **Poison message (zehirli mesaj):** Consumer'ı sürekli hata verdirten bozuk mesaj; DLQ'nun varlık sebebi.
+- **Event sözleşmesi:** Topic'e basılan veri formatı; minimal tutulur çünkü değişiklik tüm consumer'ları etkiler.
+- **Outbox pattern:** DB kaydı ile event basımını atomik yapma deseni (önce DB'ye event satırı, sonra relay basar). Kafka kesintisinde event kaybını önler; Faz 11 backlog'unda.
+- **@EmbeddedKafka:** Test içinde gerçek gömülü broker kaldıran Spring test desteği; mock'suz uçtan uca event testi.
+
 ## Domain terimleri (MeldeHub)
 - **Meldung (ihbar):** Vatandaştan gelen bir bildirim (çukur, arıza, şikâyet).
 - **Vaka (case):** İhbarın sisteme düşmüş, yönlendirilmiş hali.

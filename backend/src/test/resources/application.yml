@@ -1,5 +1,7 @@
 # Test profili — GERÇEK PostgreSQL yerine bellek içi H2.
 # İlke: testler dış bağımlılık istemez; CI'da sıfır kurulumla koşar.
+# NOT: bu dosya main application.yml'in ÜZERİNE YAZAR (birleşmez) —
+# app.* anahtarları burada da olmalı.
 spring:
   datasource:
     url: jdbc:h2:mem:meldehub-test
@@ -7,3 +9,20 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create-drop
+  kafka:
+    # @EmbeddedKafka varsa broker adresini test enjekte eder; yoksa localhost
+    bootstrap-servers: ${spring.embedded.kafka.brokers:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    consumer:
+      group-id: meldehub-routing
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: ch.meldehub.events
+
+app:
+  kafka:
+    case-created-topic: case-created
