@@ -7,10 +7,13 @@ import ch.meldehub.domain.CaseStatus;
 import ch.meldehub.events.CaseEventProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -51,9 +54,20 @@ public class CaseService {
         return saved;
     }
 
+    /**
+     * CASE-233: sayfalı listeleme. Sıralama sabit: createdAt DESC (en yeni üstte).
+     * status null ise tüm vakalar, değilse sadece o durumdakiler döner.
+     * size 100 ile sınırlanır (kötü niyetli/yanlışlıkla dev sayfalara karşı).
+     */
     @Transactional(readOnly = true)
-    public List<Case> findAll() {
-        return repository.findAll();
+    public Page<Case> findAll(int page, int size, CaseStatus status) {
+        int safePage = Math.max(0, page);
+        int safeSize = Math.min(Math.max(1, size), 100);
+        Pageable pageable = PageRequest.of(safePage, safeSize,
+                Sort.by(Sort.Direction.DESC, "createdAt"));
+        return status == null
+                ? repository.findAll(pageable)
+                : repository.findByStatus(status, pageable);
     }
 
     @Transactional(readOnly = true)

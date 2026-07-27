@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { CaseCreateRequest, CaseResponse, CaseStatus, StatusUpdateRequest } from '../models/case.model';
+import { CaseCreateRequest, CaseResponse, CaseStatus, Page, StatusUpdateRequest } from '../models/case.model';
 
 /**
  * MeldeHub vaka API istemcisi.
@@ -18,9 +18,16 @@ export class CaseService {
     return this.http.post<CaseResponse>(this.baseUrl, request);
   }
 
-  /** GET /api/cases — tüm vakaları listeler. */
-  getCases(): Observable<CaseResponse[]> {
-    return this.http.get<CaseResponse[]>(this.baseUrl);
+  /**
+   * GET /api/cases — CASE-233: sayfalı liste (Page<CaseResponse>).
+   * status verilirse backend filtreler; verilmezse tüm durumlar gelir.
+   */
+  getCases(page = 0, size = 20, status?: CaseStatus): Observable<Page<CaseResponse>> {
+    let params = new HttpParams().set('page', page).set('size', size);
+    if (status) {
+      params = params.set('status', status);
+    }
+    return this.http.get<Page<CaseResponse>>(this.baseUrl, { params });
   }
 
   /** GET /api/cases/{id} — tek vaka getirir. */

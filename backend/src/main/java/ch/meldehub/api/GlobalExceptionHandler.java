@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -37,5 +38,15 @@ public class GlobalExceptionHandler {
                 .map(fe -> fe.getField() + ": " + fe.getDefaultMessage())
                 .collect(Collectors.joining(", "));
         return ResponseEntity.badRequest().body(Map.of("error", details));
+    }
+
+    /**
+     * CASE-233: query param dönüşüm hatası (ör. ?status=BILINMEYEN) → 400.
+     * Aksi hâlde Spring 500 dönerdi; API sözleşmesi tutarlı kalsın: {"error": "..."}.
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    ResponseEntity<Map<String, String>> typeMismatch(MethodArgumentTypeMismatchException ex) {
+        String message = "Geçersiz parametre değeri: " + ex.getName() + "=" + ex.getValue();
+        return ResponseEntity.badRequest().body(Map.of("error", message));
     }
 }

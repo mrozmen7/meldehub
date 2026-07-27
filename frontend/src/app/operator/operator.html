@@ -7,6 +7,22 @@
     <button class="btn btn-secondary" (click)="reload()" [disabled]="loading()">Yenile</button>
   </header>
 
+  <div class="toolbar">
+    <label class="filter-label" for="status-filter">Durum filtresi:</label>
+    <select
+      id="status-filter"
+      class="filter-select"
+      [value]="statusFilter()"
+      (change)="onFilterChange($event)"
+      aria-label="Duruma göre filtrele"
+    >
+      <option value="">Tümü</option>
+      @for (s of statuses; track s) {
+        <option [value]="s">{{ statusLabels[s] }}</option>
+      }
+    </select>
+  </div>
+
   @if (loadError(); as msg) {
     <div class="alert alert-error" role="alert">{{ msg }}</div>
   }
@@ -15,8 +31,12 @@
     <p class="muted">Yükleniyor…</p>
   } @else if (cases().length === 0) {
     <div class="card empty">
-      <p>Henüz ihbar yok.</p>
-      <a routerLink="/report" class="btn btn-primary">İlk İhbarı Ver</a>
+      @if (statusFilter()) {
+        <p>Bu durumda vaka yok.</p>
+      } @else {
+        <p>Henüz ihbar yok.</p>
+        <a routerLink="/report" class="btn btn-primary">İlk İhbarı Ver</a>
+      }
     </div>
   } @else {
     <div class="card table-card">
@@ -60,6 +80,26 @@
           }
         </tbody>
       </table>
+
+      <nav class="pagination" aria-label="Sayfalama">
+        <button
+          class="btn btn-secondary"
+          (click)="previousPage()"
+          [disabled]="page() === 0"
+        >
+          ← Önceki
+        </button>
+        <span class="page-info">
+          Sayfa {{ page() + 1 }} / {{ totalPages() }}, toplam {{ totalElements() }} vaka
+        </span>
+        <button
+          class="btn btn-secondary"
+          (click)="nextPage()"
+          [disabled]="page() + 1 >= totalPages()"
+        >
+          Sonraki →
+        </button>
+      </nav>
     </div>
   }
 </div>

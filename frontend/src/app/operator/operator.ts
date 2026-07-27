@@ -13,7 +13,7 @@ import {
   STATUS_LABELS,
 } from '../models/case.model';
 
-/** Operatör paneli — vaka listesi + durum yönetimi */
+/** Operatör paneli — vaka listesi + durum yönetimi + CASE-233 sayfalama/filtre */
 @Component({
   selector: 'app-operator',
   imports: [DatePipe, RouterLink],
@@ -35,6 +35,14 @@ export class Operator implements OnInit {
   /** Durum güncellemesi devam eden vakalar. */
   readonly updating = signal<Record<string, boolean>>({});
 
+  // ---- CASE-233: sayfalama + durum filtresi durumu ----
+  readonly page = signal(0);
+  readonly size = 20;
+  readonly totalElements = signal(0);
+  readonly totalPages = signal(0);
+  /** '' = Tümü (filtre yok) */
+  readonly statusFilter = signal<CaseStatus | ''>('');
+
   ngOnInit(): void {
     this.reload();
   }
@@ -42,9 +50,12 @@ export class Operator implements OnInit {
   reload(): void {
     this.loading.set(true);
     this.loadError.set(null);
-    this.caseService.getCases().subscribe({
-      next: (cases) => {
-        this.cases.set(cases);
+    const status = this.statusFilter() || undefined;
+    this.caseService.getCases(this.page(), this.size, status).subscribe({
+      next: (pageData) => {
+        this.cases.set(pageData.content);
+        this.totalElements.set(pageData.totalElements);
+        this.totalPages.set(pageData.totalPages);
         this.loading.set(false);
       },
       error: () => {
@@ -52,6 +63,28 @@ export class Operator implements OnInit {
         this.loading.set(false);
       },
     });
+  }
+
+  /** Filtre değişince ilk sayfaya dönülür (CASE-233). */
+  onFilterChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    this.statusFilter.set(select.value as CaseStatus | '');
+    this.page.set(0);
+    this.reload();
+  }
+
+  previousPage(): void {
+    if (this.page() > 0) {
+      this.page.update((p) => p - 1);
+      this.reload();
+    }
+  }
+
+  nextPage(): void {
+    if (this.page() + 1 < this.totalPages()) {
+      this.page.update((p) => p + 1);
+      this.reload();
+    }
   }
 
   onStatusChange(c: CaseResponse, event: Event): void {

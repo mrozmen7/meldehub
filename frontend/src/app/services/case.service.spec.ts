@@ -3,7 +3,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 
 import { CaseService } from './case.service';
-import { CaseCreateRequest, CaseResponse } from '../models/case.model';
+import { CaseCreateRequest, CaseResponse, Page } from '../models/case.model';
 
 describe('CaseService', () => {
   let service: CaseService;
@@ -52,15 +52,42 @@ describe('CaseService', () => {
     req.flush(sampleCase);
   });
 
-  it('getCases GET /api/cases ile liste döndürmeli', () => {
-    service.getCases().subscribe((cases) => {
-      expect(cases.length).toBe(1);
-      expect(cases[0].status).toBe('NEW');
+  it('getCases varsayılan parametrelerle Page döndürmeli (CASE-233)', () => {
+    const page: Page<CaseResponse> = {
+      content: [sampleCase],
+      totalElements: 1,
+      totalPages: 1,
+      number: 0,
+      size: 20,
+    };
+
+    service.getCases().subscribe((res) => {
+      expect(res.content.length).toBe(1);
+      expect(res.content[0].status).toBe('NEW');
+      expect(res.totalElements).toBe(1);
     });
 
-    const req = httpMock.expectOne('/api/cases');
+    const req = httpMock.expectOne('/api/cases?page=0&size=20');
     expect(req.request.method).toBe('GET');
-    req.flush([sampleCase]);
+    req.flush(page);
+  });
+
+  it('getCases sayfa, boyut ve status parametrelerini göndermeli', () => {
+    const page: Page<CaseResponse> = {
+      content: [],
+      totalElements: 0,
+      totalPages: 0,
+      number: 2,
+      size: 5,
+    };
+
+    service.getCases(2, 5, 'NEW').subscribe((res) => {
+      expect(res.number).toBe(2);
+    });
+
+    const req = httpMock.expectOne('/api/cases?page=2&size=5&status=NEW');
+    expect(req.request.method).toBe('GET');
+    req.flush(page);
   });
 
   it('getCase GET /api/cases/{id} ile tek vaka döndürmeli', () => {
