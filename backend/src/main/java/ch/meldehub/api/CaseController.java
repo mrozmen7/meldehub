@@ -1,8 +1,10 @@
 package ch.meldehub.api;
 
 import ch.meldehub.domain.Case;
+import ch.meldehub.domain.CaseStatus;
 import ch.meldehub.service.CaseService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,9 +13,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -39,9 +41,20 @@ public class CaseController {
         return ResponseEntity.status(HttpStatus.CREATED).body(CaseResponse.from(created));
     }
 
+    /**
+     * CASE-233: sayfalı listeleme — cevap tipi Spring Data Page JSON'u
+     * (content, totalElements, totalPages, number, size ...).
+     *
+     *   GET /api/cases?page=0&size=20&status=NEW
+     *
+     * status opsiyonel: verilirse CaseStatus değeri olmalı (geçersizse 400 —
+     * GlobalExceptionHandler'daki MethodArgumentTypeMismatchException yakalayıcısı).
+     */
     @GetMapping
-    public List<CaseResponse> findAll() {
-        return service.findAll().stream().map(CaseResponse::from).toList();
+    public Page<CaseResponse> findAll(@RequestParam(defaultValue = "0") int page,
+                                      @RequestParam(defaultValue = "20") int size,
+                                      @RequestParam(required = false) CaseStatus status) {
+        return service.findAll(page, size, status).map(CaseResponse::from);
     }
 
     @GetMapping("/{id}")

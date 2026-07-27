@@ -72,10 +72,10 @@ class CaseApiIntegrationTest {
     void vakaYasamDongusuBasindanSonuna() throws Exception {
         String id = vakaYarat("Yol çukuru");
 
-        // listeleme + tekil okuma (operatör yetkisi)
+        // listeleme + tekil okuma (operatör yetkisi) — CASE-233: cevap artık Page JSON'u
         mvc.perform(get("/api/cases").header("Authorization", operatorAuth()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[?(@.id == '" + id + "')]").exists());
+                .andExpect(jsonPath("$.content[?(@.id == '" + id + "')]").exists());
         mvc.perform(get("/api/cases/" + id).header("Authorization", operatorAuth()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("Yol çukuru"));

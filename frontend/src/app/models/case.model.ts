@@ -45,6 +45,19 @@ export interface ApiError {
   error: string;
 }
 
+/**
+ * Spring Data Page JSON'u — backend CASE-233: GET /api/cases artık Page<CaseResponse> döner.
+ * Birebir karşılığı: org.springframework.data.domain.Page serileştirmesi.
+ */
+export interface Page<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  /** 0-tabanlı sayfa numarası */
+  number: number;
+  size: number;
+}
+
 /** UI etiketleri (Türkçe) */
 export const CATEGORY_LABELS: Record<CaseCategory, string> = {
   POTHOLE: 'Yol Çukuru',
