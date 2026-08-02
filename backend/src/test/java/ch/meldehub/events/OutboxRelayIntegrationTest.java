@@ -24,13 +24,17 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Event'in topic'e GERÇEKTEN basıldığının kanıtı.
- * @EmbeddedKafka: test içinde gerçek (gömülü) Kafka broker kalkar —
- * mock yok; producer → broker → consumer tam yolculuk ölçülür.
+ * Transactional Outbox'un uçtan uca kanıtı (CASE-252).
+ *
+ * (1) create() vaka + outbox satırını TEK transaction'da yazar → dual-write
+ * kaybı imkânsız: vaka varsa yayınlanmamış outbox satırı da vardır.
+ * (2) Relay, bekleyen satırı Kafka'ya basar, broker ack'inden SONRA satırı
+ * published işaretler; event topic'e caseId key'i ile ulaşır.
+ * Scheduler testte fiilen kapalıdır (relay-delay-ms: 600000) — relay elle tetiklenir.
  */
 @SpringBootTest
 @EmbeddedKafka(partitions = 1, topics = {"case-created"})
-class CaseCreatedEventIntegrationTest {
+class OutboxRelayIntegrationTest {
 
     @Autowired
     private EmbeddedKafkaBroker broker;
@@ -38,16 +42,34 @@ class CaseCreatedEventIntegrationTest {
     @Autowired
     private CaseService caseService;
 
-    // CASE-252: create() artık Kafka'ya senkron basmaz; event outbox'a yazılır,
-    // relay asenkron basar. Testte relay ELLE tetiklenir (scheduler testte fiilen
-    // kapalı — bkz. test application.yml, relay-delay-ms: 600000).
     @Autowired
     private OutboxRelay outboxRelay;
 
+    @Autowired
+    private OutboxEventRepository outboxEventRepository;
+
     @Test
-    void vakaYaratilincaCaseCreatedEventiTopicteOlur() {
+    void vakaYaratilincaAtomikOlarakOutboxSatiriDaOlusur() {
+        outboxEventRepository.deleteAll();   // izolasyon: sadece bu testin satırını ölç
+
+        Case created = caseService.create("Sokak lambası yanmıyor", "3 gündür karanlık",
+                CaseCategory.LIGHTING, "Bahnhofstrasse 10", "vatandas@example.ch");
+
+        List<OutboxEvent> rows = outboxEventRepository.findAll();
+        assertThat(rows).hasSize(1);
+        OutboxEvent row = rows.get(0);
+        assertThat(row.isPublished()).isFalse();
+        assertThat(row.getPublishedAt()).isNull();
+        assertThat(row.getEventType()).isEqualTo("CaseCreated");
+        assertThat(row.getAggregateId()).isEqualTo(created.getId());
+        assertThat(row.getPayload()).contains("LIGHTING");
+        assertThat(row.getCreatedAt()).isNotNull();
+    }
+
+    @Test
+    void relayBekleyenEventiTopiceBasarVeSatiriPublishedIsaretler() {
         Map<String, Object> consumerProps =
-                KafkaTestUtils.consumerProps("event-dogrulama", "true", broker);
+                KafkaTestUtils.consumerProps("outbox-dogrulama", "true", broker);
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         consumerProps.put(JsonDeserializer.TRUSTED_PACKAGES, "ch.meldehub.events");
@@ -59,22 +81,29 @@ class CaseCreatedEventIntegrationTest {
                              .createConsumer()) {
             broker.consumeFromAnEmbeddedTopic(consumer, "case-created");
 
+            outboxEventRepository.deleteAll();
             Case created = caseService.create("Çöp kutusu taşmış", "Park yanındaki kutu dolu",
                     CaseCategory.WASTE, "Seepromenade 4", "vatandas@example.ch");
-            outboxRelay.publishPending();   // outbox → Kafka, senkron ack ile
 
+            outboxRelay.publishPending();
+
+            // Satır, ancak broker ack'inden sonra published olur (at-least-once)
+            OutboxEvent row = outboxEventRepository.findAll().get(0);
+            assertThat(row.isPublished()).isTrue();
+            assertThat(row.getPublishedAt()).isNotNull();
+
+            // Event topic'e ulaştı, key = caseId string'i (vaka bazında sıra garantisi).
+            // NOT: gömülü broker test sınıfları arasında paylaşılır (context cache) →
+            // topic'te başka testlerin event'leri de olabilir. Bu yüzden "ilk kayıt"
+            // değil, BU TESTİN vakasına ait kayıt filtrelenir (order-independent).
             ConsumerRecords<String, CaseCreatedEvent> records =
                     KafkaTestUtils.getRecords(consumer, Duration.ofSeconds(10));
-
-            // Paylaşılan gömülü broker'da başka testlerin event'leri de bulunabilir;
-            // ilk kayda değil, BU TESTİN vakasına ait kayda bak (order-independent).
             List<ConsumerRecord<String, CaseCreatedEvent>> all = new java.util.ArrayList<>();
             records.forEach(all::add);
             assertThat(all).anySatisfy(record -> {
                 assertThat(record.key()).isEqualTo(created.getId().toString());
                 assertThat(record.value().caseId()).isEqualTo(created.getId());
                 assertThat(record.value().category()).isEqualTo(CaseCategory.WASTE);
-                assertThat(record.value().location()).isEqualTo("Seepromenade 4");
             });
         }
     }

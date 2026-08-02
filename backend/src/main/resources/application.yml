@@ -30,6 +30,10 @@ spring:
 app:
   kafka:
     case-created-topic: case-created   # topic adı config'den — koda gömülmez
+  outbox:
+    # Relay polling aralığı (ms) — bekleyen outbox satırları bu sıklıkta Kafka'ya basılır.
+    # Production'da gerekirse environment variable ile override edilir.
+    relay-delay-ms: 5000
   jwt:
     # GELİŞTİRME değeri — PRODUCTION'DA MUTLAKA JWT_SECRET env değişkeni ile değiştir!
     # HS256 için en az 32 bayt gerekir; kısa secret uygulama açılışında patlar (fail fast).

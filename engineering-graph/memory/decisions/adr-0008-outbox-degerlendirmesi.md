@@ -46,3 +46,31 @@ geçirilir ve Outbox uygulanır:
 - **CDC / Debezium** (WAL üzerinden outbox okuma) → güçlü ama operasyonel
   ağırlık (connector cluster, schema registry) bu ölçekte gereksiz; Outbox
   uygulanırsa relay olarak Debezium doğal adaydır
+
+## Güncelleme — CASE-252 (2026-08-02): UYGULANDI
+
+Erteleme kararı geri alındı; Transactional Outbox uygulandı. Tetik koşulları
+demo bütünlüğü açısından karşılanmış sayıldı: hacim artışı senaryosu (koşul 4'e
+giden yol) ve ikinci kritik consumer planı (koşul 3 — SMS/e-posta bildirimi
+gündemde) event kaybını artık kabul edilemez kılıyor.
+
+**Uygulama özeti:**
+- `V3__outbox_events.sql`: outbox tablosu (uuid PK, payload `text` — H2 test
+  uyumu + `ddl-auto: validate` güvenliği; jsonb bilinçli kullanılmadı) +
+  `idx_outbox_unpublished` partial index
+- `CaseService.create()`: vaka + outbox satırı TEK transaction'da yazılır;
+  serialize hatası try/catch'siz yayılır → rollback (fail fast). Dual-write
+  riski ortadan kalktı; ADR-0006'nın "event sessizce kaybolur" borcu kapandı
+- `OutboxRelay`: `@Scheduled` polling; her satır için senkron `.get()` ile
+  broker ack'i beklenir, satır ancak ack sonrası `published` olur. Hatada TÜM
+  batch rollback → sıra korunur, yanlış "published" yok, sonraki tick yeniden
+  dener. Garanti: at-least-once → consumer idempotent olmalı
+- `CaseEventProducer` kaldırıldı (tek çağıranı CaseService'ti; key = caseId
+  sıra-garantisi notu OutboxRelay javadoc'una taşındı)
+
+**Bilinçli yapılmayanlar:**
+- **Debezium CDC kurulmadı** — scheduled relay bu ölçekte yeterli; CDC'nin
+  operasyonel ağırlığı (connector cluster, schema registry) hâlâ gereksiz.
+  Hacim/latency ihtiyacı doğarsa doğal evrim yolu Debezium'dur
+- **DLT alerting hâlâ backlog'da** (ADR-0006) — outbox, consumer tarafındaki
+  zehirli mesaj izlemesini kapsamaz
