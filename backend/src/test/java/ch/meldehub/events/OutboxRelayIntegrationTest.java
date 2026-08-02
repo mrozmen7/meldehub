@@ -92,14 +92,19 @@ class OutboxRelayIntegrationTest {
             assertThat(row.isPublished()).isTrue();
             assertThat(row.getPublishedAt()).isNotNull();
 
-            // Event topic'e ulaştı, key = caseId string'i (vaka bazında sıra garantisi)
+            // Event topic'e ulaştı, key = caseId string'i (vaka bazında sıra garantisi).
+            // NOT: gömülü broker test sınıfları arasında paylaşılır (context cache) →
+            // topic'te başka testlerin event'leri de olabilir. Bu yüzden "ilk kayıt"
+            // değil, BU TESTİN vakasına ait kayıt filtrelenir (order-independent).
             ConsumerRecords<String, CaseCreatedEvent> records =
                     KafkaTestUtils.getRecords(consumer, Duration.ofSeconds(10));
-            assertThat(records.count()).isGreaterThanOrEqualTo(1);
-            ConsumerRecord<String, CaseCreatedEvent> record = records.iterator().next();
-            assertThat(record.key()).isEqualTo(created.getId().toString());
-            assertThat(record.value().caseId()).isEqualTo(created.getId());
-            assertThat(record.value().category()).isEqualTo(CaseCategory.WASTE);
+            List<ConsumerRecord<String, CaseCreatedEvent>> all = new java.util.ArrayList<>();
+            records.forEach(all::add);
+            assertThat(all).anySatisfy(record -> {
+                assertThat(record.key()).isEqualTo(created.getId().toString());
+                assertThat(record.value().caseId()).isEqualTo(created.getId());
+                assertThat(record.value().category()).isEqualTo(CaseCategory.WASTE);
+            });
         }
     }
 }

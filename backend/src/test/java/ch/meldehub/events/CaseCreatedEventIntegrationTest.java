@@ -1,9 +1,11 @@
 package ch.meldehub.events;
 
+import ch.meldehub.domain.Case;
 import ch.meldehub.domain.CaseCategory;
 import ch.meldehub.service.CaseService;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.Test;
@@ -16,6 +18,7 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,18 +59,23 @@ class CaseCreatedEventIntegrationTest {
                              .createConsumer()) {
             broker.consumeFromAnEmbeddedTopic(consumer, "case-created");
 
-            caseService.create("Çöp kutusu taşmış", "Park yanındaki kutu dolu",
+            Case created = caseService.create("Çöp kutusu taşmış", "Park yanındaki kutu dolu",
                     CaseCategory.WASTE, "Seepromenade 4", "vatandas@example.ch");
             outboxRelay.publishPending();   // outbox → Kafka, senkron ack ile
 
             ConsumerRecords<String, CaseCreatedEvent> records =
                     KafkaTestUtils.getRecords(consumer, Duration.ofSeconds(10));
 
-            assertThat(records.count()).isGreaterThanOrEqualTo(1);
-            CaseCreatedEvent event = records.iterator().next().value();
-            assertThat(event.category()).isEqualTo(CaseCategory.WASTE);
-            assertThat(event.location()).isEqualTo("Seepromenade 4");
-            assertThat(event.caseId()).isNotNull();
+            // Paylaşılan gömülü broker'da başka testlerin event'leri de bulunabilir;
+            // ilk kayda değil, BU TESTİN vakasına ait kayda bak (order-independent).
+            List<ConsumerRecord<String, CaseCreatedEvent>> all = new java.util.ArrayList<>();
+            records.forEach(all::add);
+            assertThat(all).anySatisfy(record -> {
+                assertThat(record.key()).isEqualTo(created.getId().toString());
+                assertThat(record.value().caseId()).isEqualTo(created.getId());
+                assertThat(record.value().category()).isEqualTo(CaseCategory.WASTE);
+                assertThat(record.value().location()).isEqualTo("Seepromenade 4");
+            });
         }
     }
 }
