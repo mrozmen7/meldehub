@@ -32,6 +32,10 @@ spring:
 app:
   kafka:
     case-created-topic: case-created
+  outbox:
+    # 10 dk: testler relay'i ELLE tetikler (relay.publishPending()) — scheduler'ın
+    # test ortasında kendiliğinden çalışması flaky sonuç doğurur, fiilen kapalı.
+    relay-delay-ms: 600000
   jwt:
     # Test secret — main application.yml yerine BU dosya yüklendiği için burada da olmalı
     secret: meldehub-test-secret-0123456789abcdef0123456789

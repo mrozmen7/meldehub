@@ -35,6 +35,12 @@ class CaseCreatedEventIntegrationTest {
     @Autowired
     private CaseService caseService;
 
+    // CASE-252: create() artık Kafka'ya senkron basmaz; event outbox'a yazılır,
+    // relay asenkron basar. Testte relay ELLE tetiklenir (scheduler testte fiilen
+    // kapalı — bkz. test application.yml, relay-delay-ms: 600000).
+    @Autowired
+    private OutboxRelay outboxRelay;
+
     @Test
     void vakaYaratilincaCaseCreatedEventiTopicteOlur() {
         Map<String, Object> consumerProps =
@@ -52,6 +58,7 @@ class CaseCreatedEventIntegrationTest {
 
             caseService.create("Çöp kutusu taşmış", "Park yanındaki kutu dolu",
                     CaseCategory.WASTE, "Seepromenade 4", "vatandas@example.ch");
+            outboxRelay.publishPending();   // outbox → Kafka, senkron ack ile
 
             ConsumerRecords<String, CaseCreatedEvent> records =
                     KafkaTestUtils.getRecords(consumer, Duration.ofSeconds(10));

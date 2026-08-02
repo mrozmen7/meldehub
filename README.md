@@ -51,6 +51,7 @@ Shut down: `docker compose down` (add `-v` to wipe data).
 | Case API | Spring Boot 3.5, Java 21 — paginated & filterable list (`page`, `size` ≤ 100, `status`) |
 | State machine | NEW → TRIAGED → IN_PROGRESS → RESOLVED → CLOSED, invalid transitions → 409 |
 | Messaging | Kafka `case-created` producer + routing consumer + DLQ; API stays up when Kafka is down (ADR-0006) |
+| Transactional Outbox | Case + outbox row written in one DB transaction; scheduled relay publishes to Kafka — at-least-once delivery, consumers must be idempotent (CASE-252, ADR-0008) |
 | Persistence | PostgreSQL, Flyway migrations (V1 cases, V2 users), Hibernate `validate` |
 | Security | JWT login, roles CITIZEN / OPERATOR, stateless filter chain, 401/403 JSON errors (ADR-0009) |
 | Frontend | Angular 22, standalone components, reactive forms, route guards, HTTP interceptor |
